@@ -1,5 +1,5 @@
 # game options/settings
-TITLE = "Jumpy!"
+TITLE = "Jump Jump Jump!"
 WIDTH = 480
 HEIGHT = 600
 FPS = 60
@@ -38,4 +38,5 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 LIGHTBLUE = (0, 155, 155)
-BGCOLOR = LIGHTBLUE
+GREY = (192, 192, 192)
+BGCOLOR = GREY

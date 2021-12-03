@@ -2,7 +2,11 @@
 import pygame as pg
 from settings import *
 from random import choice, randrange
+import os
+
 vec = pg.math.Vector2
+game_folder = os.path.dirname(__file__)
+img_folder = os.path.join(game_folder, "img")
 
 class Spritesheet:
     # utility class for loading and parsing spritesheets
@@ -26,27 +30,13 @@ class Player(pg.sprite.Sprite):
         self.jumping = False
         self.current_frame = 0
         self.last_update = 0
-        self.load_images()
-        self.image = self.standing_frames[0]
+        self.image = pg.image.load(os.path.join(img_folder, "player.png")).convert()
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.center = (40, HEIGHT - 100)
         self.pos = vec(40, HEIGHT - 100)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
-
-    def load_images(self):
-        self.standing_frames = [self.game.spritesheet.get_image(614, 1063, 120, 191),
-                                self.game.spritesheet.get_image(690, 406, 120, 201)]
-        for frame in self.standing_frames:
-            frame.set_colorkey(BLACK)
-        self.walk_frames_r = [self.game.spritesheet.get_image(678, 860, 120, 201),
-                              self.game.spritesheet.get_image(692, 1458, 120, 207)]
-        self.walk_frames_l = []
-        for frame in self.walk_frames_r:
-            frame.set_colorkey(BLACK)
-            self.walk_frames_l.append(pg.transform.flip(frame, True, False))
-        self.jump_frame = self.game.spritesheet.get_image(382, 763, 150, 181)
-        self.jump_frame.set_colorkey(BLACK)
 
     def jump_cut(self):
         if self.jumping:
@@ -97,43 +87,18 @@ class Player(pg.sprite.Sprite):
         if self.walking:
             if now - self.last_update > 180:
                 self.last_update = now
-                self.current_frame = (self.current_frame + 1) % len(self.walk_frames_l)
                 bottom = self.rect.bottom
-                if self.vel.x > 0:
-                    self.image = self.walk_frames_r[self.current_frame]
-                else:
-                    self.image = self.walk_frames_l[self.current_frame]
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
         # show idle animation
         if not self.jumping and not self.walking:
             if now - self.last_update > 350:
                 self.last_update = now
-                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
                 bottom = self.rect.bottom
-                self.image = self.standing_frames[self.current_frame]
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
         self.mask = pg.mask.from_surface(self.image)
 
-class Cloud(pg.sprite.Sprite):
-    def __init__(self, game):
-        self._layer = CLOUD_LAYER
-        self.groups = game.all_sprites, game.clouds
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = choice(self.game.cloud_images)
-        self.image.set_colorkey(BLACK)
-        self.rect = self.image.get_rect()
-        scale = randrange(50, 101) / 100
-        self.image = pg.transform.scale(self.image, (int(self.rect.width * scale),
-                                                     int(self.rect.height * scale)))
-        self.rect.x = randrange(WIDTH - self.rect.width)
-        self.rect.y = randrange(-500, -50)
-
-    def update(self):
-        if self.rect.top > HEIGHT * 2:
-            self.kill()
 
 class Platform(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -141,9 +106,14 @@ class Platform(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.platforms
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        images = [self.game.spritesheet.get_image(0, 288, 380, 94),
-                  self.game.spritesheet.get_image(213, 1662, 201, 100)]
-        self.image = choice(images)
+        normal_images = [self.game.spritesheet.get_image(0, 576, 380, 94),
+                         self.game.spritesheet.get_image(218, 1456, 201, 100)]
+        broken_images = [self.game.spritesheet.get_image(0, 480, 380, 94),
+                         self.game.spritesheet.get_image(0, 382, 306, 94)]
+        # images = [pg.image.load(os.path.join(img_folder, "floor.png")).convert(),
+        #           pg.image.load(os.path.join(img_folder, "floor_broken.png")).convert(),
+        #           pg.image.load(os.path.join(img_folder, "floor_sheer.png")).convert()]
+        self.image = choice(normal_images + broken_images)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -159,7 +129,7 @@ class Pow(pg.sprite.Sprite):
         self.game = game
         self.plat = plat
         self.type = choice(['boost'])
-        self.image = self.game.spritesheet.get_image(820, 1805, 71, 70)
+        self.image = pg.image.load(os.path.join(img_folder, "key.png")).convert()
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = self.plat.rect.centerx
@@ -176,11 +146,8 @@ class Mob(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image_up = self.game.spritesheet.get_image(566, 510, 122, 139)
-        self.image_up.set_colorkey(BLACK)
-        self.image_down = self.game.spritesheet.get_image(568, 1534, 122, 135)
-        self.image_down.set_colorkey(BLACK)
-        self.image = self.image_up
+        self.image = pg.image.load(os.path.join(img_folder, "monster.png")).convert()
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = choice([-100, WIDTH + 100])
         self.vx = randrange(1, 4)
@@ -196,10 +163,6 @@ class Mob(pg.sprite.Sprite):
         if self.vy > 3 or self.vy < -3:
             self.dy *= -1
         center = self.rect.center
-        if self.dy < 0:
-            self.image = self.image_up
-        else:
-            self.image = self.image_down
         self.rect = self.image.get_rect()
         self.mask = pg.mask.from_surface(self.image)
         self.rect.center = center
