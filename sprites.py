@@ -4,6 +4,17 @@ from settings import *
 from random import choice, randrange
 import os
 
+# gyroscope ADD
+import time
+import board
+import digitalio
+import adafruit_lis3dh
+# END
+
+# gyroscope ADD
+start = time.time()
+# END
+
 vec = pg.math.Vector2
 game_folder = os.path.dirname(__file__)
 img_folder = os.path.join(game_folder, "img")
@@ -33,7 +44,16 @@ class Player(pg.sprite.Sprite):
         self.pos = vec(40, HEIGHT - 100)
         self.vel = vec(0, 0)
         self.acc = vec(0, PLAYER_GRAV)
-    
+
+    # gyroscope ADD      
+    def gyroscope(self):
+        #if((time.time() - start) % 5.0 <= 1.0):
+                i2c = board.I2C()
+                int1 = digitalio.DigitalInOut(board.D6)  # Set this to the correct pin for the interrupt!
+                lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
+                self.x, self.y, self.z = lis3dh.acceleration
+    # END
+        
     def jump(self):
         #We check if the player sprite is standing on a platform on or not.
         self.pos[1] -= self.vel[1]
@@ -59,6 +79,7 @@ class Player(pg.sprite.Sprite):
             self.acc.y = PLAYER_GRAV
     
     def update(self):
+        
         #self.animate()
         self.acc.x = 0
         keys = pg.key.get_pressed()
@@ -66,6 +87,20 @@ class Player(pg.sprite.Sprite):
             self.acc.x = -PLAYER_ACC
         if keys[pg.K_RIGHT]:
             self.acc.x = PLAYER_ACC
+        
+        
+        """
+        # gyroscope ADD
+        #self.animate()
+        self.gyroscope()
+        self.acc.x = 0
+        keys = pg.key.get_pressed()
+        if self.x < -3.0:
+            self.acc.x = -PLAYER_ACC
+        if self.x >  3.0:
+            self.acc.x = PLAYER_ACC
+        # END
+        """
 
         # apply friction
         self.acc.x += self.vel.x * PLAYER_FRICTION
