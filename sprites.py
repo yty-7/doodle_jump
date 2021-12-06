@@ -5,14 +5,14 @@ from random import choice, randrange
 import os
 
 # gyroscope ADD
-import time
-import board
-import digitalio
-import adafruit_lis3dh
+#import time
+#import board
+#import digitalio
+#import adafruit_lis3dh
 # END
 
 # gyroscope ADD
-start = time.time()
+#start = time.time()
 # END
 
 vec = pg.math.Vector2
