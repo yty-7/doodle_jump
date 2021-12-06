@@ -37,6 +37,7 @@ class Game:
         self.snd_dir = path.join(self.dir, 'snd')
         self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump33.wav'))
         self.boost_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Boost16.wav'))
+        self.background = pg.image.load(os.path.join(img_folder, "bg.png"))
 
     def new(self):
         # start a new game
@@ -166,7 +167,7 @@ class Game:
 
     def draw(self):
         # Game Loop - draw
-        self.screen.fill(BGCOLOR)
+        self.screen.blit(self.background,(0,0))
         self.all_sprites.draw(self.screen)
         self.draw_text(str(self.score), 22, TXTCOLOR, WIDTH / 2, 15)
         # *after* drawing everything, flip the display
@@ -176,7 +177,7 @@ class Game:
         # game splash/start screen
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
-        self.screen.fill(BGCOLOR)
+        self.screen.blit(self.background,(0,0))
         self.draw_text(TITLE, 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         self.draw_text("Move the pad to move", 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2)
         self.draw_text("Press a button to play", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
@@ -191,7 +192,7 @@ class Game:
             return
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
-        self.screen.fill(BGCOLOR)
+        self.screen.blit(self.background)
         self.draw_text("GAME OVER", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         self.draw_text("Score: " + str(self.score), 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2)
         self.draw_text("Press a key to play again", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
