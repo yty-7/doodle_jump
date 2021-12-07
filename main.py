@@ -38,24 +38,22 @@ class Game:
         self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump33.wav'))
         self.boost_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Boost16.wav'))
         self.background = pg.image.load(os.path.join(img_folder, "bg.png"))
+        self.blood_img = pg.image.load(path.join(img_dir,'blood.png'))
 
     def new(self):
         # start a new game
         self.score = 0
         self.blood = 5
         self.all_sprites = pg.sprite.LayeredUpdates()
-        self.platforms = pg.sprite.Group()
+        self.normal_platforms = pg.sprite.Group()
+        self.broken_platforms = pg.sprite.Group()
         self.powerups = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
-        self.bloods = pg.sprite.Group()
         self.player = Player(self)
         self.hit_mob = 0
-        self.blood_xPosition = 15
+        self.blood = 3
         for plat in PLATFORM_LIST:
-            Platform(self, *plat)
-        for _ in range(5):
-            Blood(self,self.blood_xPosition,15)
-            self.blood_xPosition += 30
+            NormalPlatform(self, *plat)
         self.mob_timer = 0
         pg.mixer.music.load(path.join(self.snd_dir, 'Happy Tune.ogg'))
         self.run()
@@ -85,17 +83,16 @@ class Game:
         mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, pg.sprite.collide_mask)
         if mob_hits:
             now = pg.time.get_ticks()
-            if now - self.hit_mob > 250:
-                self.blood_xPosition -= 30
-                self.bloods
+            if now - self.hit_mob > 1000:
+                self.blood -= 1
                 print(self.blood)
             self.hit_mob = now
-        if self.bloods.empty():
+        if self.blood <= 0:
             self.playing = False
 
         # check if player hits a platform - only if falling
         if self.player.vel.y > 0:
-            hits = pg.sprite.spritecollide(self.player, self.platforms, False)
+            hits = pg.sprite.spritecollide(self.player, self.normal_platforms, False)
             if hits:
                 lowest = hits[0]
                 for hit in hits:
@@ -107,6 +104,14 @@ class Game:
                         self.player.pos.y = lowest.rect.top
                         self.player.vel.y = 10
                 self.player.jump()
+            else:
+                hits = pg.sprite.spritecollide(self.player, self.broken_platforms, False)
+                if hits:
+                    lowest = hits[0]
+                    for hit in hits:
+                        if hit.rect.bottom > lowest.rect.bottom:
+                            hit.kill()
+                            
 
         # if player reaches top 1/4 of screen
         if self.player.rect.top <= HEIGHT / 4:
@@ -115,7 +120,12 @@ class Game:
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for mob in self.mobs:
                 mob.rect.y += max(abs(self.player.vel.y), 2)
-            for plat in self.platforms:
+            for plat in self.normal_platforms:
+                plat.rect.y += max(abs(self.player.vel.y), 2)
+                if plat.rect.top >= HEIGHT:
+                    plat.kill()
+                    self.score += 10
+            for plat in self.broken_platforms:
                 plat.rect.y += max(abs(self.player.vel.y), 2)
                 if plat.rect.top >= HEIGHT:
                     plat.kill()
@@ -127,8 +137,7 @@ class Game:
             if pow.type == 'life':
                 self.boost_sound.play()
                 if self.blood < 5:
-                    Blood(self, self.blood_xPosition, 15)
-                    self.blood_xPosition += 30
+                    self.blood += 1
 
         # Die!
         if self.player.rect.bottom > HEIGHT:
@@ -136,14 +145,20 @@ class Game:
                 sprite.rect.y -= max(self.player.vel.y, 10)
                 if sprite.rect.bottom < 0:
                     sprite.kill()
-        if len(self.platforms) == 0:
+        if len(self.normal_platforms) == 0 and len(self.broken_platforms) == 0:
             self.playing = False
 
         # spawn new platforms to keep same average number
-        while len(self.platforms) < 6:
+        while len(self.normal_platforms) + len(self.broken_platforms) < 6:
             width = random.randrange(50, 100)
-            Platform(self, random.randrange(0, WIDTH - width),
-                     random.randrange(-75, -30))
+            NormalPlatform(self, random.randrange(0, WIDTH - width),
+                random.randrange(-75, -30))   
+            if random.random() > self.score / 3000:
+                NormalPlatform(self, random.randrange(0, WIDTH - width),
+                        random.randrange(-75, -30))   
+            else:      
+                BrokenPlatform(self, random.randrange(0, WIDTH - width),
+                    random.randrange(-75, -30))
 
     def events(self):
         # Game Loop - events
@@ -170,6 +185,11 @@ class Game:
         self.screen.blit(self.background,(0,0))
         self.all_sprites.draw(self.screen)
         self.draw_text(str(self.score), 22, TXTCOLOR, WIDTH / 2, 15)
+        x_position = 15
+        for _ in range(self.blood):
+            self.screen.blit(self.blood_img,(x_position,15))
+            x_position += 30
+
         # *after* drawing everything, flip the display
         pg.display.flip()
 
@@ -192,7 +212,7 @@ class Game:
             return
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
-        self.screen.blit(self.background)
+        self.screen.blit(self.background,[0,0])
         self.draw_text("GAME OVER", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         self.draw_text("Score: " + str(self.score), 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2)
         self.draw_text("Press a key to play again", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)

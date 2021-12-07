@@ -58,7 +58,7 @@ class Player(pg.sprite.Sprite):
         #We check if the player sprite is standing on a platform on or not.
         self.pos[1] -= self.vel[1]
 
-        hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+        hits = pg.sprite.spritecollide(self, self.game.normal_platforms, False)
         if hits:
             self.pos[1] -= self.vel[1]
             if self.rect.bottom > HEIGHT:
@@ -72,7 +72,7 @@ class Player(pg.sprite.Sprite):
          
     def jump(self):
         # jump only if standing on a platform
-        hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+        hits = pg.sprite.spritecollide(self, self.game.normal_platforms, False)
         if hits and self.vel.y > 0:
             self.game.jump_sound.play()
             self.vel.y = -PLAYER_JUMP
@@ -136,20 +136,31 @@ class Player(pg.sprite.Sprite):
     #     self.mask = pg.mask.from_surface(self.image)
 
 
-class Platform(pg.sprite.Sprite):
+class NormalPlatform(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self._layer = PLATFORM_LAYER
-        self.groups = game.all_sprites, game.platforms
+        self.groups = game.all_sprites, game.normal_platforms
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         normal_images = [self.game.spritesheet.get_image(0, 576, 380, 94),
                          self.game.spritesheet.get_image(218, 1456, 201, 100)]
+        self.image = choice(normal_images)
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        if randrange(100) < POW_SPAWN_PCT:
+            Pow(self.game, self)
+
+class BrokenPlatform(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self._layer = PLATFORM_LAYER
+        self.groups = game.all_sprites, game.broken_platforms
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
         broken_images = [self.game.spritesheet.get_image(0, 480, 380, 94),
                          self.game.spritesheet.get_image(382, 306, 200, 100)]
-        # images = [pg.image.load(os.path.join(img_folder, "floor.png")).convert(),
-        #           pg.image.load(os.path.join(img_folder, "floor_broken.png")).convert(),
-        #           pg.image.load(os.path.join(img_folder, "floor_sheer.png")).convert()]
-        self.image = choice(normal_images + broken_images)
+        self.image = choice(broken_images)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -173,7 +184,7 @@ class Pow(pg.sprite.Sprite):
 
     def update(self):
         self.rect.bottom = self.plat.rect.top - 5
-        if not self.game.platforms.has(self.plat):
+        if not self.game.normal_platforms.has(self.plat) and not self.game.broken_platforms.has(self.plat):
             self.kill()
 
 class Mob(pg.sprite.Sprite):
@@ -204,15 +215,4 @@ class Mob(pg.sprite.Sprite):
         if self.rect.left > WIDTH + 100 or self.rect.right < -100:
             self.kill()
 
-class Blood(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.bloods
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        blood_image = pg.image.load(os.path.join(img_folder, "blood.png")).convert()
-        self.image = pg.transform.scale(blood_image, (20,20))
-        self.image.set_colorkey(BLACK)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
 
