@@ -47,7 +47,7 @@ class Game:
         self.all_sprites = pg.sprite.LayeredUpdates()
         self.normal_platforms = pg.sprite.Group()
         self.broken_platforms = pg.sprite.Group()
-        self.powerups = pg.sprite.Group()
+        self.pows = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
         self.player = Player(self)
         self.hit_mob = 0
@@ -129,12 +129,15 @@ class Game:
                     self.score += 10
 
         # if player hits life
-        pow_hits = pg.sprite.spritecollide(self.player, self.powerups, True)
+        pow_hits = pg.sprite.spritecollide(self.player, self.pows, True)
         for pow in pow_hits:
             if pow.type == 'life':
                 self.boost_sound.play()
                 if self.blood < PLAYER_LIFE:
                     self.blood += 1
+            if pow.type == 'boost':
+                self.boost_sound.play()
+                self.player.vel.y = -BOOST_POWER
 
         # Die!
         if self.player.rect.bottom > HEIGHT:
@@ -146,16 +149,13 @@ class Game:
             self.playing = False
 
         # spawn new platforms to keep same average number
-        while len(self.normal_platforms) + len(self.broken_platforms) < 6:
+        while len(self.normal_platforms) < 5:
             width = random.randrange(50, 100)
-            NormalPlatform(self, random.randrange(0, WIDTH - width),
-                random.randrange(-75, -30))   
-            if random.random() > self.score / 500:
-                NormalPlatform(self, random.randrange(0, WIDTH - width),
-                        random.randrange(-75, -30))   
-            else:      
+            NormalPlatform(self, random.randrange(0, WIDTH - width), random.randrange(-75,-30))
+            #NormalPlatform(self, random.randrange(0, WIDTH - width), -30)    
+            if random.random() < self.score / 3000:  
                 BrokenPlatform(self, random.randrange(0, WIDTH - width),
-                    random.randrange(-75, -30))
+                    random.randrange(-75,-30))
 
     def events(self):
         # Game Loop - events

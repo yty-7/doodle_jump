@@ -1,7 +1,7 @@
 # Sprite classes for platform game
 import pygame as pg
 from settings import *
-from random import choice, randrange
+import random
 import os
 
 # gyroscope ADD
@@ -117,25 +117,6 @@ class Player(pg.sprite.Sprite):
 
         self.rect.midbottom = self.pos
 
-    # def animate(self):
-    #     now = pg.time.get_ticks()
-    #     # show walk animation
-    #     if self.walking:
-    #         if now - self.last_update > 180:
-    #             self.last_update = now
-    #             bottom = self.rect.bottom
-    #             self.rect = self.image.get_rect()
-    #             self.rect.bottom = bottom
-    #     # show idle animation
-    #     if not self.jumping and not self.walking:
-    #         if now - self.last_update > 350:
-    #             self.last_update = now
-    #             bottom = self.rect.bottom
-    #             self.rect = self.image.get_rect()
-    #             self.rect.bottom = bottom
-    #     self.mask = pg.mask.from_surface(self.image)
-
-
 class NormalPlatform(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self._layer = PLATFORM_LAYER
@@ -144,12 +125,12 @@ class NormalPlatform(pg.sprite.Sprite):
         self.game = game
         normal_images = [self.game.spritesheet.get_image(0, 576, 380, 94),
                          self.game.spritesheet.get_image(218, 1456, 201, 100)]
-        self.image = choice(normal_images)
+        self.image = random.choice(normal_images)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        if randrange(100) < POW_SPAWN_PCT:
+        if random.randrange(100) < POW_SPAWN_PCT:
             Pow(self.game, self)
 
 class BrokenPlatform(pg.sprite.Sprite):
@@ -160,23 +141,26 @@ class BrokenPlatform(pg.sprite.Sprite):
         self.game = game
         broken_images = [self.game.spritesheet.get_image(0, 480, 380, 94),
                          self.game.spritesheet.get_image(382, 306, 200, 100)]
-        self.image = choice(broken_images)
+        self.image = random.choice(broken_images)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        if randrange(100) < POW_SPAWN_PCT:
+        if random.randrange(100) < POW_SPAWN_PCT:
             Pow(self.game, self)
 
 class Pow(pg.sprite.Sprite):
     def __init__(self, game, plat):
         self._layer = POW_LAYER
-        self.groups = game.all_sprites, game.powerups
+        self.groups = game.all_sprites, game.pows
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.plat = plat
-        self.type = choice(['life'])
-        self.image = self.game.spritesheet.get_image(897, 0, 55, 114)
+        self.type = random.choice(['life','boost'])
+        if self.type == 'life':
+            self.image = self.game.spritesheet.get_image(820, 1733, 78, 70)
+        if self.type == 'boost':
+            self.image = self.game.spritesheet.get_image(852, 1089, 65, 77)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = self.plat.rect.centerx
@@ -196,9 +180,9 @@ class Mob(pg.sprite.Sprite):
         self.image = pg.image.load(os.path.join(img_folder, "monster.png")).convert()
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.rect.centerx = choice([-100, WIDTH + 100])
-        self.vx = -randrange(1, 4)
-        self.rect.y = randrange(HEIGHT / 2)
+        self.rect.centerx = random.choice([-100, WIDTH + 100])
+        self.vx = -random.randrange(1, 4)
+        self.rect.y = random.randrange(HEIGHT / 2)
         self.vy = 0
         self.dy = 0.5
 
