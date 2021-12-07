@@ -51,7 +51,7 @@ class Game:
         self.mobs = pg.sprite.Group()
         self.player = Player(self)
         self.hit_mob = 0
-        self.blood = 3
+        self.blood = PLAYER_LIFE
         for plat in PLATFORM_LIST:
             NormalPlatform(self, *plat)
         self.mob_timer = 0
@@ -104,13 +104,10 @@ class Game:
                         self.player.pos.y = lowest.rect.top
                         self.player.vel.y = 10
                 self.player.jump()
-            else:
-                hits = pg.sprite.spritecollide(self.player, self.broken_platforms, False)
-                if hits:
-                    lowest = hits[0]
-                    for hit in hits:
-                        if hit.rect.bottom > lowest.rect.bottom:
-                            hit.kill()
+            hits = pg.sprite.spritecollide(self.player, self.broken_platforms, False)
+            if hits:
+                for hit in hits:
+                    hit.kill()
                             
 
         # if player reaches top 1/4 of screen
@@ -136,7 +133,7 @@ class Game:
         for pow in pow_hits:
             if pow.type == 'life':
                 self.boost_sound.play()
-                if self.blood < 5:
+                if self.blood < PLAYER_LIFE:
                     self.blood += 1
 
         # Die!
@@ -153,7 +150,7 @@ class Game:
             width = random.randrange(50, 100)
             NormalPlatform(self, random.randrange(0, WIDTH - width),
                 random.randrange(-75, -30))   
-            if random.random() > self.score / 3000:
+            if random.random() > self.score / 500:
                 NormalPlatform(self, random.randrange(0, WIDTH - width),
                         random.randrange(-75, -30))   
             else:      
