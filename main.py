@@ -114,8 +114,6 @@ class Game:
 
         # if player reaches top 1/4 of screen
         if self.player.rect.top <= HEIGHT / 4:
-            # if random.randrange(100) < 15:
-            #     Cloud(self)
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for mob in self.mobs:
                 mob.rect.y += max(abs(self.player.vel.y), 2)
@@ -230,11 +228,11 @@ class Game:
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,[0,0])
-        #self.draw_text("GAME OVER", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         if self.score < 3000:
             self.draw_text("Try it again!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         else:
-            self.draw_text("You've got Potter, go back and save the earth!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+            self.draw_text("You've got Potter!", 35, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+            self.draw_text("go back and save the earth!", 35, TXTCOLOR, WIDTH / 2, HEIGHT / 3)
         self.draw_text("Score: " + str(self.score), 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2)
         self.draw_text("Press a key to play again", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
         if self.score > self.highscore:

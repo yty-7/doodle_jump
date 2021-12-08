@@ -52,23 +52,6 @@ class Player(pg.sprite.Sprite):
                 int1 = digitalio.DigitalInOut(board.D6)  # Set this to the correct pin for the interrupt!
                 lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
                 self.x, self.y, self.z = lis3dh.acceleration
-    # END
-        
-    # def jump(self):
-    #     #We check if the player sprite is standing on a platform on or not.
-    #     self.pos[1] -= self.vel[1]
-
-    #     hits = pg.sprite.spritecollide(self, self.game.normal_platforms, False)
-    #     if hits:
-    #         self.pos[1] -= self.vel[1]
-    #         if self.rect.bottom > HEIGHT:
-    #             self.vel[1] = -5
-    #         if self.rect.bottom < 0:
-    #             self.isAlive = False
-    #         if self.rect.left > WIDTH:
-    #             self.rect.right = 0
-    #     else:
-    #         self.isAlive = False
          
     def jump(self):
         # jump only if standing on a platform
