@@ -38,6 +38,7 @@ class Game:
         self.snd_dir = path.join(self.dir, 'snd')
         self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump33.wav'))
         self.boost_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Boost16.wav'))
+        self.hurt_sound = pg.mixer.Sound(path.join(self.snd_dir, 'MonsterHurt.wav'))
         self.background = pg.image.load(os.path.join(img_folder, "bg.png"))
         self.blood_img = pg.image.load(path.join(img_dir,'blood.png'))
 
@@ -86,7 +87,7 @@ class Game:
             now = pg.time.get_ticks()
             if now - self.hit_mob > 1000:
                 self.blood -= 1
-                print(self.blood)
+                self.hurt_sound.play()
             self.hit_mob = now
         if self.blood <= 0:
             self.playing = False
@@ -171,12 +172,6 @@ class Game:
                 if self.playing:
                     self.playing = False
                 self.running = False
-            # if event.type == pg.KEYDOWN:
-            #     if event.key == pg.K_SPACE:
-            #         self.player.jump()
-            # if event.type == pg.KEYUP:
-            #     if event.key == pg.K_SPACE:
-            #         self.player.jump_cut()
 
     def draw(self):
         # Game Loop - draw
@@ -205,15 +200,15 @@ class Game:
         pg.mixer.music.fadeout(500)
 
     def show_loading_screen(self):
-        pg.mixer.music.load(path.join(self.snd_dir, 'Loadingguide.wav'))
+        pg.mixer.music.load(path.join(self.snd_dir, 'Loadingguide1.6.wav'))
         pg.mixer.music.play(loops=-1)
         picture = pg.transform.scale(pg.image.load(os.path.join(img_folder, "player.png")), (35, 35))
         step = 0
         length = 400
         while True:
             self.screen.blit(self.background,(0,0))
-            pg.draw.rect(self.screen,(255,255,255),(40,500,length+10,20))
-            pg.draw.rect(self.screen,(196,158,222),(40,500,step % length,20))
+            pg.draw.rect(self.screen,WHITE,(40,500,length+10,20))
+            pg.draw.rect(self.screen,PURPLE,(40,500,step % length,20))
             self.screen.blit(picture,(step % length + 40,490))
 
             font1 = pg.font.Font(self.font_name, 16)
