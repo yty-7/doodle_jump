@@ -200,12 +200,15 @@ class Game:
         pg.mixer.music.fadeout(500)
 
     def show_loading_screen(self):
+        if self.running is False:
+            return
         pg.mixer.music.load(path.join(self.snd_dir, 'Loadingguide1.6.wav'))
         pg.mixer.music.play(loops=-1)
         picture = pg.transform.scale(pg.image.load(os.path.join(img_folder, "player.png")), (35, 35))
         step = 0
         length = 400
         while True:
+            self.events()
             self.screen.blit(self.background,(0,0))
             pg.draw.rect(self.screen,WHITE,(40,500,length+10,20))
             pg.draw.rect(self.screen,PURPLE,(40,500,step % length,20))
@@ -215,7 +218,7 @@ class Game:
             text1 = font1.render('%s %%' % str(int((step % length)/length*100)), True, (0,0,0))
             self.screen.blit(text1, (240, 500))
             step += 5
-            time.sleep(0.45)
+            time.sleep(0.23)
             pg.display.flip()
             if step == length:
                 break
@@ -227,7 +230,11 @@ class Game:
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,[0,0])
-        self.draw_text("GAME OVER", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+        #self.draw_text("GAME OVER", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+        if self.score < 3000:
+            self.draw_text("Try it again!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+        else:
+            self.draw_text("You've got Potter, go back and save the earth!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         self.draw_text("Score: " + str(self.score), 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2)
         self.draw_text("Press a key to play again", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
         if self.score > self.highscore:
