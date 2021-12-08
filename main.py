@@ -10,6 +10,7 @@ from settings import *
 from sprites import *
 from os import path
 import time
+import RPi.GPIO as GPIO
 
 class Game:
     def __init__(self):
@@ -22,7 +23,16 @@ class Game:
         self.running = True
         self.font_name = pg.font.match_font(FONT_NAME)
         self.load_data()
-
+        
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        
+        def GPIO27_calllback(channel):
+            self.wait = 1 
+            #print("27 callback")
+            
+        GPIO.add_event_detect(27,GPIO.FALLING,callback=GPIO27_calllback,bouncetime=300)
+        
     def load_data(self):
         # load high score
         self.dir = path.dirname(__file__)
@@ -38,7 +48,7 @@ class Game:
         self.snd_dir = path.join(self.dir, 'snd')
         self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Jump33.wav'))
         self.boost_sound = pg.mixer.Sound(path.join(self.snd_dir, 'Boost16.wav'))
-        self.hurt_sound = pg.mixer.Sound(path.join(self.snd_dir, 'MonsterHurt.wav'))
+        self.hurt_sound = pg.mixer.Sound(path.join(self.snd_dir, 'monster.wav'))
         self.background = pg.image.load(os.path.join(img_folder, "bg.png"))
         self.blood_img = pg.image.load(path.join(img_dir,'blood.png'))
 
@@ -114,6 +124,8 @@ class Game:
 
         # if player reaches top 1/4 of screen
         if self.player.rect.top <= HEIGHT / 4:
+            # if random.randrange(100) < 15:
+            #     Cloud(self)
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for mob in self.mobs:
                 mob.rect.y += max(abs(self.player.vel.y), 2)
@@ -186,12 +198,13 @@ class Game:
 
     def show_start_screen(self):
         # game splash/start screen
+        self.wait = 0
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,(0,0))
         self.draw_text(TITLE, 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         self.draw_text("Move the pad to move", 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2)
-        self.draw_text("Press a button to play", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
+        self.draw_text("Press the button to play", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
         self.draw_text("High Score: " + str(self.highscore), 22, TXTCOLOR, WIDTH / 2, 15)
         pg.display.flip()
         self.wait_for_key()
@@ -228,13 +241,13 @@ class Game:
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,[0,0])
+        #self.draw_text("GAME OVER", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         if self.score < 3000:
             self.draw_text("Try it again!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         else:
-            self.draw_text("You've got Potter!", 35, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
-            self.draw_text("go back and save the earth!", 35, TXTCOLOR, WIDTH / 2, HEIGHT / 3)
+            self.draw_text("You've got Potter, go back and save the earth!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         self.draw_text("Score: " + str(self.score), 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2)
-        self.draw_text("Press a key to play again", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
+        self.draw_text("Press the button to play again", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
         if self.score > self.highscore:
             self.highscore = self.score
             self.draw_text("NEW HIGH SCORE!", 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2 + 40)
@@ -254,8 +267,10 @@ class Game:
                 if event.type == pg.QUIT:
                     waiting = False
                     self.running = False
-                if event.type == pg.KEYUP:
-                    waiting = False
+                #if event.type == pg.KEYUP:
+            if  self.wait == 1:
+                self.wait = 0
+                waiting = False
 
     def draw_text(self, text, size, color, x, y):
         font = pg.font.Font(self.font_name, size)
