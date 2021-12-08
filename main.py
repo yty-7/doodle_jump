@@ -9,6 +9,7 @@ import random
 from settings import *
 from sprites import *
 from os import path
+import time
 
 class Game:
     def __init__(self):
@@ -203,6 +204,27 @@ class Game:
         self.wait_for_key()
         pg.mixer.music.fadeout(500)
 
+    def show_loading_screen(self):
+        pg.mixer.music.load(path.join(self.snd_dir, 'Loadingguide.wav'))
+        pg.mixer.music.play(loops=-1)
+        picture = pg.transform.scale(pg.image.load(os.path.join(img_folder, "player.png")), (35, 35))
+        step = 0
+        length = 400
+        while True:
+            self.screen.blit(self.background,(0,0))
+            pg.draw.rect(self.screen,(255,255,255),(40,500,length+10,20))
+            pg.draw.rect(self.screen,(196,158,222),(40,500,step % length,20))
+            self.screen.blit(picture,(step % length + 40,490))
+
+            font1 = pg.font.Font(self.font_name, 16)
+            text1 = font1.render('%s %%' % str(int((step % length)/length*100)), True, (0,0,0))
+            self.screen.blit(text1, (240, 500))
+            step += 5
+            time.sleep(0.45)
+            pg.display.flip()
+            if step == length:
+                break
+
     def show_go_screen(self):
         # game over/continue
         if not self.running:
@@ -244,6 +266,7 @@ class Game:
 
 g = Game()
 g.show_start_screen()
+g.show_loading_screen()
 while g.running:
     g.new()
     g.show_go_screen()

@@ -89,18 +89,18 @@ class Player(pg.sprite.Sprite):
             self.acc.x = PLAYER_ACC
         
         
-        """
-        # gyroscope ADD
-        #self.animate()
-        self.gyroscope()
-        self.acc.x = 0
-        keys = pg.key.get_pressed()
-        if self.x < -3.0:
-            self.acc.x = -PLAYER_ACC
-        if self.x >  3.0:
-            self.acc.x = PLAYER_ACC
-        # END
-        """
+        
+        # # gyroscope ADD
+        # #self.animate()
+        # self.gyroscope()
+        # self.acc.x = 0
+        # keys = pg.key.get_pressed()
+        # if self.x < -3.0:
+        #     self.acc.x = -PLAYER_ACC
+        # if self.x >  3.0:
+        #     self.acc.x = PLAYER_ACC
+        # # END
+        
 
         # apply friction
         self.acc.x += self.vel.x * PLAYER_FRICTION
