@@ -10,7 +10,7 @@ from settings import *
 from sprites import *
 from os import path
 import time
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 
 class Game:
     def __init__(self):
@@ -24,14 +24,14 @@ class Game:
         self.font_name = pg.font.match_font(FONT_NAME)
         self.load_data()
         
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        # GPIO.setmode(GPIO.BCM)
+        # GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         
-        def GPIO27_calllback(channel):
-            self.wait = 1 
-            #print("27 callback")
+        # def GPIO27_calllback(channel):
+        #     self.wait = 1 
+        #     #print("27 callback")
             
-        GPIO.add_event_detect(27,GPIO.FALLING,callback=GPIO27_calllback,bouncetime=300)
+        #GPIO.add_event_detect(27,GPIO.FALLING,callback=GPIO27_calllback,bouncetime=300)
         
     def load_data(self):
         # load high score
@@ -124,8 +124,6 @@ class Game:
 
         # if player reaches top 1/4 of screen
         if self.player.rect.top <= HEIGHT / 4:
-            # if random.randrange(100) < 15:
-            #     Cloud(self)
             self.player.pos.y += max(abs(self.player.vel.y), 2)
             for mob in self.mobs:
                 mob.rect.y += max(abs(self.player.vel.y), 2)
@@ -171,11 +169,6 @@ class Game:
 
     def events(self):
         # Game Loop - events
-        # self.player.rect.y += 2
-        # hits = pg.sprite.spritecollide(self.player, self.platforms, False)
-        # self.player.rect.y -= 2
-        # while hits:
-        #     self.player.jump()
         for event in pg.event.get():
             # check for closing window
             if event.type == pg.QUIT:
@@ -198,7 +191,7 @@ class Game:
 
     def show_start_screen(self):
         # game splash/start screen
-        self.wait = 0
+        #self.wait = 0
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,(0,0))
@@ -211,7 +204,7 @@ class Game:
         pg.mixer.music.fadeout(500)
 
     def show_loading_screen(self):
-        if self.running is False:
+        if not self.running:
             return
         pg.mixer.music.load(path.join(self.snd_dir, 'Loadingguide1.6.wav'))
         pg.mixer.music.play(loops=-1)
@@ -267,10 +260,12 @@ class Game:
                 if event.type == pg.QUIT:
                     waiting = False
                     self.running = False
-                #if event.type == pg.KEYUP:
-            if  self.wait == 1:
-                self.wait = 0
-                waiting = False
+                if event.type == pg.KEYUP:
+                    waiting = False    
+            # if  self.wait == 1:
+            #     self.wait = 0
+            #     waiting = False
+            
 
     def draw_text(self, text, size, color, x, y):
         font = pg.font.Font(self.font_name, size)
