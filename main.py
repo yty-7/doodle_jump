@@ -10,7 +10,7 @@ from settings import *
 from sprites import *
 from os import path
 import time
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 class Game:
     def __init__(self):
@@ -24,14 +24,14 @@ class Game:
         self.font_name = pg.font.match_font(FONT_NAME)
         self.load_data()
         
-        # GPIO.setmode(GPIO.BCM)
-        # GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         
-        # def GPIO27_calllback(channel):
-        #     self.wait = 1 
-        #     #print("27 callback")
+        def GPIO27_calllback(channel):
+            self.wait = 1 
+            #print("27 callback")
             
-        # GPIO.add_event_detect(27,GPIO.FALLING,callback=GPIO27_calllback,bouncetime=300)
+        GPIO.add_event_detect(27,GPIO.FALLING,callback=GPIO27_calllback,bouncetime=300)
               
     def load_data(self):
         # load high score
@@ -190,7 +190,7 @@ class Game:
 
     def show_start_screen(self):
         # game splash/start screen
-        # self.wait = 0
+        self.wait = 0
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,(0,0))
@@ -258,11 +258,11 @@ class Game:
                 if event.type == pg.QUIT:
                     waiting = False
                     self.running = False 
-                if event.type == pg.KEYUP:
-                    waiting = False
-            # if  self.wait == 1:
-            #     self.wait = 0
-            #     waiting = False
+                # if event.type == pg.KEYUP:
+                #     waiting = False
+            if  self.wait == 1:
+                self.wait = 0
+                waiting = False
             
 
     def draw_text(self, text, size, color, x, y):

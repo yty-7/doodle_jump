@@ -4,15 +4,15 @@ from settings import *
 import random
 import os
 
-# # gyroscope ADD
-# import time
-# import board
-# import digitalio
-# import adafruit_lis3dh
-# # END
+# gyroscope ADD
+import time
+import board
+import digitalio
+import adafruit_lis3dh
+# END
 
 # gyroscope ADD
-#start = time.time()
+start = time.time()
 # END
 
 vec = pg.math.Vector2
@@ -44,12 +44,12 @@ class Player(pg.sprite.Sprite):
         self.vel = vec(0, 0)
         self.acc = vec(0, PLAYER_GRAV)
 
-    # # gyroscope ADD      
-    # def gyroscope(self):
-    #     i2c = board.I2C()
-    #     int1 = digitalio.DigitalInOut(board.D6)  # Set this to the correct pin for the interrupt!
-    #     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
-    #     self.x, self.y, self.z = lis3dh.acceleration
+    # gyroscope ADD      
+    def gyroscope(self):
+        i2c = board.I2C()
+        int1 = digitalio.DigitalInOut(board.D6)  # Set this to the correct pin for the interrupt!
+        lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
+        self.x, self.y, self.z = lis3dh.acceleration
          
     def jump(self):
         # jump only if standing on a platform
@@ -61,24 +61,24 @@ class Player(pg.sprite.Sprite):
     
     def update(self):
         
-        # keyboard control
-        self.acc.x = 0
-        keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT]:
-            self.acc.x = -PLAYER_ACC
-        if keys[pg.K_RIGHT]:
-            self.acc.x = PLAYER_ACC
-        
-        
-        # # gyroscope ADD
-        # self.gyroscope()
+        # # keyboard control
         # self.acc.x = 0
         # keys = pg.key.get_pressed()
-        # if self.x < -3.0:
+        # if keys[pg.K_LEFT]:
         #     self.acc.x = -PLAYER_ACC
-        # if self.x >  3.0:
+        # if keys[pg.K_RIGHT]:
         #     self.acc.x = PLAYER_ACC
-        # # END
+        
+        
+        # gyroscope ADD
+        self.gyroscope()
+        self.acc.x = 0
+        keys = pg.key.get_pressed()
+        if self.x < -3.0:
+            self.acc.x = -PLAYER_ACC
+        if self.x >  3.0:
+            self.acc.x = PLAYER_ACC
+        # END
 
         # apply friction
         self.acc.x += self.vel.x * PLAYER_FRICTION
