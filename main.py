@@ -10,7 +10,7 @@ from settings import *
 from sprites import *
 from os import path
 import time
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 class Game:
     def __init__(self):
@@ -24,15 +24,15 @@ class Game:
         self.font_name = pg.font.match_font(FONT_NAME)
         self.load_data()
         
-        # GPIO.setmode(GPIO.BCM)
-        # GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         
-        # def GPIO27_calllback(channel):
-        #     self.wait = 1 
-        #     #print("27 callback")
+        def GPIO27_calllback(channel):
+            self.wait = 1 
+            #print("27 callback")
             
-        #GPIO.add_event_detect(27,GPIO.FALLING,callback=GPIO27_calllback,bouncetime=300)
-        
+        GPIO.add_event_detect(27,GPIO.FALLING,callback=GPIO27_calllback,bouncetime=300)
+              
     def load_data(self):
         # load high score
         self.dir = path.dirname(__file__)
@@ -56,7 +56,6 @@ class Game:
         # start a new game
         self.score = 0
         self.blood = 5
-        self.all_sprites = pg.sprite.LayeredUpdates()
         self.normal_platforms = pg.sprite.Group()
         self.broken_platforms = pg.sprite.Group()
         self.pows = pg.sprite.Group()
@@ -162,7 +161,6 @@ class Game:
         while len(self.normal_platforms) < 5:
             width = random.randrange(50, 100)
             NormalPlatform(self, random.randrange(0, WIDTH - width), random.randrange(-75,-30))
-            #NormalPlatform(self, random.randrange(0, WIDTH - width), -30)    
             if random.random() < self.score / 3000:  
                 BrokenPlatform(self, random.randrange(0, WIDTH - width),
                     random.randrange(-75,-30))
@@ -186,12 +184,12 @@ class Game:
             self.screen.blit(self.blood_img,(x_position,15))
             x_position += 30
 
-        # *after* drawing everything, flip the display
+        # after drawing everything, flip the display
         pg.display.flip()
 
     def show_start_screen(self):
         # game splash/start screen
-        #self.wait = 0
+        self.wait = 0
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,(0,0))
@@ -234,7 +232,6 @@ class Game:
         pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,[0,0])
-        #self.draw_text("GAME OVER", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         if self.score < 2000:
             self.draw_text("Try it again!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         else:
@@ -259,12 +256,12 @@ class Game:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     waiting = False
-                    self.running = False
+                    self.running = False 
                 if event.type == pg.KEYUP:
-                    waiting = False    
-            # if  self.wait == 1:
-            #     self.wait = 0
-            #     waiting = False
+                    waiting = False
+            if  self.wait == 1:
+                self.wait = 0
+                waiting = False
             
 
     def draw_text(self, text, size, color, x, y):
