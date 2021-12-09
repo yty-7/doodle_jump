@@ -87,7 +87,7 @@ class Game:
 
         # spawn a mob?
         now = pg.time.get_ticks()
-        if now - self.mob_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
+        if now - self.mob_timer > 3500 + random.choice([-1000, -500, 0, 500, 1000]):
             self.mob_timer = now
             Mob(self)
         
@@ -95,7 +95,7 @@ class Game:
         mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, pg.sprite.collide_mask)
         if mob_hits:
             now = pg.time.get_ticks()
-            if now - self.hit_mob > 1000:
+            if now - self.hit_mob > 500:
                 self.blood -= 1
                 self.hurt_sound.play()
             self.hit_mob = now
@@ -242,7 +242,7 @@ class Game:
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,[0,0])
         #self.draw_text("GAME OVER", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
-        if self.score < 3000:
+        if self.score < 2000:
             self.draw_text("Try it again!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         else:
             self.draw_text("You've got Potter, go back and save the earth!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
