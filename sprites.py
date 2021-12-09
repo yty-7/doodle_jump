@@ -4,12 +4,12 @@ from settings import *
 import random
 import os
 
-# gyroscope ADD
+# # gyroscope ADD
 # import time
 # import board
 # import digitalio
 # import adafruit_lis3dh
-# END
+# # END
 
 # gyroscope ADD
 #start = time.time()
@@ -33,8 +33,7 @@ class Spritesheet:
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game):
-        self._layer = PLAYER_LAYER
-        self.groups = game.all_sprites
+        self.groups = game.all_sprites        
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.image.load(os.path.join(img_folder, "player.png")).convert()
@@ -45,13 +44,12 @@ class Player(pg.sprite.Sprite):
         self.vel = vec(0, 0)
         self.acc = vec(0, PLAYER_GRAV)
 
-    # gyroscope ADD      
-    def gyroscope(self):
-        #if((time.time() - start) % 5.0 <= 1.0):
-                i2c = board.I2C()
-                int1 = digitalio.DigitalInOut(board.D6)  # Set this to the correct pin for the interrupt!
-                lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
-                self.x, self.y, self.z = lis3dh.acceleration
+    # # gyroscope ADD      
+    # def gyroscope(self):
+    #     i2c = board.I2C()
+    #     int1 = digitalio.DigitalInOut(board.D6)  # Set this to the correct pin for the interrupt!
+    #     lis3dh = adafruit_lis3dh.LIS3DH_I2C(i2c, int1=int1)
+    #     self.x, self.y, self.z = lis3dh.acceleration
          
     def jump(self):
         # jump only if standing on a platform
@@ -63,8 +61,7 @@ class Player(pg.sprite.Sprite):
     
     def update(self):
         
-        
-        #self.animate()
+        # keyboard control
         self.acc.x = 0
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]:
@@ -73,9 +70,7 @@ class Player(pg.sprite.Sprite):
             self.acc.x = PLAYER_ACC
         
         
-        
         # # gyroscope ADD
-        # #self.animate()
         # self.gyroscope()
         # self.acc.x = 0
         # keys = pg.key.get_pressed()
@@ -84,7 +79,6 @@ class Player(pg.sprite.Sprite):
         # if self.x >  3.0:
         #     self.acc.x = PLAYER_ACC
         # # END
-        
 
         # apply friction
         self.acc.x += self.vel.x * PLAYER_FRICTION
@@ -103,7 +97,6 @@ class Player(pg.sprite.Sprite):
 
 class NormalPlatform(pg.sprite.Sprite):
     def __init__(self, game, x, y):
-        self._layer = PLATFORM_LAYER
         self.groups = game.all_sprites, game.normal_platforms
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -119,7 +112,6 @@ class NormalPlatform(pg.sprite.Sprite):
 
 class BrokenPlatform(pg.sprite.Sprite):
     def __init__(self, game, x, y):
-        self._layer = PLATFORM_LAYER
         self.groups = game.all_sprites, game.broken_platforms
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -135,7 +127,6 @@ class BrokenPlatform(pg.sprite.Sprite):
 
 class Pow(pg.sprite.Sprite):
     def __init__(self, game, plat):
-        self._layer = POW_LAYER
         self.groups = game.all_sprites, game.pows
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -157,7 +148,6 @@ class Pow(pg.sprite.Sprite):
 
 class Mob(pg.sprite.Sprite):
     def __init__(self, game):
-        self._layer = MOB_LAYER
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
