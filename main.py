@@ -55,18 +55,17 @@ class Game:
     def new(self):
         # start a new game
         self.score = 0
-        self.blood = 5
         self.all_sprites = pg.sprite.Group()
         self.normal_platforms = pg.sprite.Group()
         self.broken_platforms = pg.sprite.Group()
         self.pows = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
         self.player = Player(self)
-        self.hit_mob = 0
+        self.hit_mob = 0 #lastime hit mob
         self.blood = PLAYER_LIFE
         for plat in PLATFORM_LIST:
             NormalPlatform(self, *plat)
-        self.mob_timer = 0
+        self.mob_timer = 0 #lasttime generate mob
         pg.mixer.music.load(path.join(self.snd_dir, 'Happy Tune.ogg'))
         self.run()
 
@@ -92,7 +91,8 @@ class Game:
             Mob(self)
         
         # hit mobs?
-        mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, pg.sprite.collide_mask)
+        #mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, pg.sprite.collide_mask)
+        mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, False)
         if mob_hits:
             now = pg.time.get_ticks()
             if now - self.hit_mob > 500:
