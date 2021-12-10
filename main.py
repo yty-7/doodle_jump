@@ -236,7 +236,8 @@ class Game:
         if self.score < 2000:
             self.draw_text("Try it again!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
         else:
-            self.draw_text("You've got Potter, go back and save the earth!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+            self.draw_text("You've got Potter!", 35, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+            self.draw_text("Go back and save the earth!", 35, TXTCOLOR, WIDTH / 2, HEIGHT / 3)
         self.draw_text("Score: " + str(self.score), 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2)
         self.draw_text("Press the button to play again", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
         if self.score > self.highscore:
