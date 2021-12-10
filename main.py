@@ -91,8 +91,7 @@ class Game:
             Mob(self)
         
         # hit mobs?
-        #mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, pg.sprite.collide_mask)
-        mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, False)
+        mob_hits = pg.sprite.spritecollide(self.player, self.mobs, False, pg.sprite.collide_mask)
         if mob_hits:
             now = pg.time.get_ticks()
             if now - self.hit_mob > 500:
@@ -234,9 +233,10 @@ class Game:
         pg.mixer.music.play(loops=-1)
         self.screen.blit(self.background,[0,0])
         if self.score < 2000:
-            self.draw_text("Try it again!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
-        else:
-            self.draw_text("You've got Potter, go back and save the earth!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+        #     self.draw_text("Try it again!", 48, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+        # else:
+            self.draw_text("You've got Potter!", 35, TXTCOLOR, WIDTH / 2, HEIGHT / 4)
+            self.draw_text("Go back and save the earth!", 35, TXTCOLOR, WIDTH / 2, HEIGHT / 3)
         self.draw_text("Score: " + str(self.score), 22, TXTCOLOR, WIDTH / 2, HEIGHT / 2)
         self.draw_text("Press the button to play again", 22, TXTCOLOR, WIDTH / 2, HEIGHT * 3 / 4)
         if self.score > self.highscore:
